@@ -2,6 +2,8 @@ package me.avo.io.ktor.auth.jwt.sample
 
 import io.ktor.application.*
 import io.ktor.auth.*
+import io.ktor.features.*
+import io.ktor.jackson.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -12,6 +14,10 @@ fun startServer() = embeddedServer(Netty, 5000) {
 
     val userSource: UserSource = UserSourceImpl()
 
+    install(CallLogging)
+    install(ContentNegotiation) {
+        jackson {  }
+    }
     install(Routing) {
 
         /**

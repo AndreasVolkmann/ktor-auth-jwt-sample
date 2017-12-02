@@ -2,7 +2,7 @@ group 'me.avo'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.2.0'
+    ext.kotlin_version = '1.1.60'
     ext.ktor_version = '0.9.0'
 
     repositories {
@@ -23,11 +23,11 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
 
     compile "io.ktor:ktor-server-core:$ktor_version"
     compile "io.ktor:ktor-server-netty:$ktor_version"
-    //compile "io.ktor:ktor-jackson:$ktor_version"
+    compile "io.ktor:ktor-jackson:$ktor_version"
     compile "io.ktor:ktor-auth:$ktor_version"
 
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
