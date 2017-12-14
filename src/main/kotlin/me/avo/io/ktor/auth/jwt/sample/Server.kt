@@ -2,6 +2,7 @@ package me.avo.io.ktor.auth.jwt.sample
 
 import io.ktor.application.*
 import io.ktor.auth.*
+import io.ktor.auth.jwt.*
 import io.ktor.features.*
 import io.ktor.jackson.*
 import io.ktor.request.*
@@ -16,7 +17,7 @@ fun startServer() = embeddedServer(Netty, 5000) {
 
     install(CallLogging)
     install(ContentNegotiation) {
-        jackson {  }
+        jackson { }
     }
     install(Routing) {
 

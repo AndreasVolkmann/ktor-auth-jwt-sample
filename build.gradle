@@ -2,8 +2,8 @@ group 'me.avo'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.1.60'
-    ext.ktor_version = '0.9.0'
+    ext.kotlin_version = '1.2.0'
+    ext.ktor_version = '0.9.1-alpha-8'
 
     repositories {
         mavenCentral()
@@ -28,10 +28,7 @@ dependencies {
     compile "io.ktor:ktor-server-core:$ktor_version"
     compile "io.ktor:ktor-server-netty:$ktor_version"
     compile "io.ktor:ktor-jackson:$ktor_version"
-    compile "io.ktor:ktor-auth:$ktor_version"
-
-    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-    compile group: 'com.auth0', name: 'java-jwt', version: '3.3.0'
+    compile "io.ktor:ktor-auth-jwt:$ktor_version"
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.0.2'
     testImplementation group: 'org.amshove.kluent', name: 'kluent', version: '1.30'
