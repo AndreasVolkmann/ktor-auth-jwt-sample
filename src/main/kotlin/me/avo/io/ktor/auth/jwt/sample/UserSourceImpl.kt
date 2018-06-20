@@ -12,7 +12,6 @@ class UserSourceImpl : UserSource {
         return testUser
     }
 
-    private val testUser = User(1, "Test", listOf("Egypt", "Austria"))
     private val users = listOf(testUser).associateBy(User::id)
 
 }

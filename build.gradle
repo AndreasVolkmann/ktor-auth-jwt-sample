@@ -5,6 +5,7 @@ buildscript {
     ext {
         kotlin_version = '1.2.50'
         ktor_version = '0.9.2'
+        junit_version = '5.2.0'
     }
 
     repositories {
@@ -28,13 +29,29 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     compile "io.ktor:ktor-server-core:$ktor_version"
-    compile "io.ktor:ktor-server-netty:$ktor_version"
-    compile "io.ktor:ktor-jackson:$ktor_version"
+    //compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "io.ktor:ktor-server-cio:$ktor_version"
+    compile "io.ktor:ktor-gson:$ktor_version"
     compile "io.ktor:ktor-auth-jwt:$ktor_version"
 
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.0.2'
-    testImplementation group: 'org.amshove.kluent', name: 'kluent', version: '1.30'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.2.0'
+    testImplementation group: 'org.amshove.kluent', name: 'kluent', version: '1.38'
     testImplementation "io.ktor:ktor-server-test-host:$ktor_version"
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:$junit_version"
+}
+
+test {
+    useJUnitPlatform {
+        excludeTags 'slow'
+        includeEngines 'junit-jupiter'
+    }
+
+    testLogging {
+        events "failed"
+        exceptionFormat "full"
+    }
+
+    failFast = false
 }
 
 compileKotlin {
