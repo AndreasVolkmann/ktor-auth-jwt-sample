@@ -1,24 +1,45 @@
 package me.avo.io.ktor.auth.jwt.sample
 
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.auth.jwt.*
-import io.ktor.features.*
-import io.ktor.jackson.*
-import io.ktor.request.*
-import io.ktor.response.*
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.auth.Authentication
+import io.ktor.auth.UserPasswordCredential
+import io.ktor.auth.authenticate
+import io.ktor.auth.authentication
+import io.ktor.auth.jwt.jwt
+import io.ktor.features.CallLogging
+import io.ktor.features.ContentNegotiation
+import io.ktor.jackson.jackson
+import io.ktor.request.receive
+import io.ktor.response.respond
+import io.ktor.response.respondText
 import io.ktor.routing.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
 
 fun startServer() = embeddedServer(Netty, 5000) {
-
-    val userSource: UserSource = UserSourceImpl()
-
     install(CallLogging)
     install(ContentNegotiation) {
         jackson { }
     }
+
+    val userSource: UserSource = UserSourceImpl()
+    install(Authentication) {
+        /**
+         * Setup the JWT authentication to be used in [Routing].
+         * If the token is valid, the corresponding [User] is fetched from the database.
+         * The [User] can then be accessed in each [ApplicationCall].
+         */
+        jwt("jwt") {
+            verifier(JwtConfig.verifier)
+            realm = "ktor.io"
+            validate {
+                it.payload.getClaim("id").asInt()?.let(userSource::findUserById)
+            }
+        }
+    }
+
     install(Routing) {
 
         /**
@@ -31,35 +52,24 @@ fun startServer() = embeddedServer(Netty, 5000) {
             call.respondText(token)
         }
 
-        route("secret") {
+        /**
+         * All [Route]s in the authentication block are secured.
+         */
+        authenticate("jwt") {
+            route("secret") {
 
-            /**
-             * A secret [Route], which requires a valid JWT.
-             * If the token is valid, the corresponding [User] is fetched from the database.
-             * The [User] can then be accessed in each [ApplicationCall].
-             */
-            authentication {
-                jwtAuthentication(JwtConfig.verifier, "ktor.io") {
-                    it.payload.getClaim("id").asInt()?.let(userSource::findUserById)
+                get {
+                    val user = call.user
+                    call.respond(user.countries)
                 }
-            }
 
-            /**
-             * All [Route]s following the authentication block are secured.
-             */
-            get {
-                val user = call.user
-                call.respond(user.countries)
-            }
+                put {
+                    TODO("All your secret routes can follow here")
+                }
 
-            put {
-                TODO("All your secret routes can follow here")
             }
-
         }
-
     }
-
 }.start(true)
 
 private val ApplicationCall.user get() = authentication.principal<User>()!!
