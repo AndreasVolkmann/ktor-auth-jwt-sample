@@ -6,12 +6,10 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.header
 import io.ktor.server.testing.TestApplicationEngine
+import io.ktor.server.testing.TestApplicationRequest
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
-import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeGreaterThan
-import org.amshove.kluent.shouldEqual
-import org.amshove.kluent.shouldNotBeNullOrBlank
+import org.amshove.kluent.*
 import org.junit.jupiter.api.Test
 
 class ServerTest {
@@ -42,7 +40,7 @@ class ServerTest {
     @Test fun `request with token should pass`() = withServer {
         val req = handleRequest {
             uri = "/secret"
-            addHeader("Authorization", "Bearer ${getToken()}")
+            addJwtHeader()
         }
         req.requestHandled shouldBe true
         req.response.let {
@@ -50,6 +48,31 @@ class ServerTest {
             it.content.shouldNotBeNullOrBlank()
         }
     }
+
+    @Test fun `optional route should work without token`() = withServer {
+        val req = handleRequest {
+            uri = "/optional"
+        }
+        req.let {
+            it.requestHandled.shouldBeTrue()
+            it.response.status() shouldEqual HttpStatusCode.OK
+            it.response.content.shouldNotBeNullOrBlank() shouldBeEqualTo "optional"
+        }
+    }
+
+    @Test fun `optional route should work with token`() = withServer {
+        val req = handleRequest {
+            uri = "/optional"
+            addJwtHeader()
+        }
+        req.let {
+            it.requestHandled.shouldBeTrue()
+            it.response.status() shouldEqual HttpStatusCode.OK
+            it.response.content.shouldNotBeNullOrBlank() shouldBeEqualTo "authenticated!"
+        }
+    }
+
+    private fun TestApplicationRequest.addJwtHeader() = addHeader("Authorization", "Bearer ${getToken()}")
 
     private fun getToken() = JwtConfig.makeToken(testUser)
 

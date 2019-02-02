@@ -27,7 +27,7 @@ fun Application.module() {
          * If the token is valid, the corresponding [User] is fetched from the database.
          * The [User] can then be accessed in each [ApplicationCall].
          */
-        jwt("jwt") {
+        jwt {
             verifier(JwtConfig.verifier)
             realm = "ktor.io"
             validate {
@@ -51,11 +51,11 @@ fun Application.module() {
         /**
          * All [Route]s in the authentication block are secured.
          */
-        authenticate("jwt") {
+        authenticate {
             route("secret") {
 
                 get {
-                    val user = call.user
+                    val user = call.user!!
                     call.respond(user.countries)
                 }
 
@@ -63,6 +63,17 @@ fun Application.module() {
                     TODO("All your secret routes can follow here")
                 }
 
+            }
+        }
+
+        /**
+         * Routes with optional authentication
+         */
+        authenticate(optional = true) {
+            get("optional") {
+                val user = call.user
+                val response = if (user != null) "authenticated!" else "optional"
+                call.respond(response)
             }
         }
     }
