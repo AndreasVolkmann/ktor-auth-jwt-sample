@@ -4,13 +4,9 @@ import io.ktor.auth.*
 
 class UserSourceImpl : UserSource {
 
-    override fun findUserById(id: Int): User {
-        return users[id]!!
-    }
+    override fun findUserById(id: Int): User = users.getValue(id)
 
-    override fun findUserByCredentials(credential: UserPasswordCredential): User {
-        return testUser
-    }
+    override fun findUserByCredentials(credential: UserPasswordCredential): User = testUser
 
     private val users = listOf(testUser).associateBy(User::id)
 

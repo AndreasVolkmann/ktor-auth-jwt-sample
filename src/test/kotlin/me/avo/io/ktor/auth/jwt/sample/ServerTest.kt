@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import io.ktor.auth.UserPasswordCredential
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.request.header
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
@@ -19,12 +20,14 @@ class ServerTest {
         val req = handleRequest {
             method = HttpMethod.Post
             uri = "/login"
+            addHeader("Content-Type", "application/json")
             setBody(
                 Gson().toJson(UserPasswordCredential("user", "pass"))
             )
         }
 
         req.requestHandled shouldBe true
+        req.response.status() shouldEqual HttpStatusCode.OK
         req.response.content.shouldNotBeNullOrBlank().length shouldBeGreaterThan 6
     }
 
